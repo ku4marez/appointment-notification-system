@@ -19,6 +19,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<spring-cloud.version>2022.0.4</spring-cloud.version>
+		<commonlibraries.version>1.0.9</commonlibraries.version>
 	</properties>
 
 	<dependencies>
@@ -74,6 +75,17 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.ku4marez</groupId>
+			<artifactId>common-libraries</artifactId>
+			<version>${commonlibraries.version}</version>
+		</dependency>
+		<!-- Lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
