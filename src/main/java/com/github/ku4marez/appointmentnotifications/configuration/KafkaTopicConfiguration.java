@@ -3,10 +3,10 @@ package com.github.ku4marez.appointmentnotifications.configuration;
 import com.github.ku4marez.commonlibraries.util.KafkaTopicUtil;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import static com.github.ku4marez.commonlibraries.constant.KafkaConstants.APPOIN
 import static com.github.ku4marez.commonlibraries.constant.KafkaConstants.APPOINTMENT_UPDATED_TOPIC;
 
 @Configuration
-@ConditionalOnProperty(name = "spring.kafka.enabled", havingValue = "true", matchIfMissing = true)
+@Profile("!test")
 public class KafkaTopicConfiguration {
 
     @Value("${spring.kafka.bootstrap-servers}")
