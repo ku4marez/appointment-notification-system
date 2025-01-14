@@ -1,8 +1,12 @@
 package com.github.ku4marez.appointmentnotifications.controller;
 
 import com.github.ku4marez.appointmentnotifications.entity.NotificationEntity;
-import com.github.ku4marez.appointmentnotifications.repository.NotificationRepository;
+import com.github.ku4marez.appointmentnotifications.query.FindNotificationsByDoctorQuery;
+import com.github.ku4marez.appointmentnotifications.query.FindNotificationsByPatientQuery;
+import org.axonframework.messaging.responsetypes.ResponseTypes;
+import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,20 +18,24 @@ import java.util.List;
 @RequestMapping("/notifications")
 public class NotificationController {
 
-    private final NotificationRepository notificationRepository;
+    private final QueryGateway queryGateway;
 
     @Autowired
-    public NotificationController(NotificationRepository notificationRepository) {
-        this.notificationRepository = notificationRepository;
+    public NotificationController(QueryGateway queryGateway) {
+        this.queryGateway = queryGateway;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/doctor/{doctorId}")
     public List<NotificationEntity> getNotificationsForDoctor(@PathVariable String doctorId) {
-        return notificationRepository.findByDoctorId(doctorId);
+        FindNotificationsByDoctorQuery query = new FindNotificationsByDoctorQuery(doctorId);
+        return queryGateway.query(query, ResponseTypes.multipleInstancesOf(NotificationEntity.class)).join();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/patient/{patientId}")
     public List<NotificationEntity> getNotificationsForPatient(@PathVariable String patientId) {
-        return notificationRepository.findByPatientId(patientId);
+        FindNotificationsByPatientQuery query = new FindNotificationsByPatientQuery(patientId);
+        return queryGateway.query(query, ResponseTypes.multipleInstancesOf(NotificationEntity.class)).join();
     }
 }
