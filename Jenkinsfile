@@ -7,19 +7,13 @@ pipeline {
     }
 
     stages {
-    stage('Checkout Code') {
-        steps {
-            checkout scm
-            sh '''
-        echo "Listing all files in src/test/resources directory:"
-        ls -al $WORKSPACE/appointment-notifications/src/test/resources
-        echo "Listing all files in src/test/resources directory:"
-        ls -al $WORKSPACE/src/test/resources
-        echo "Listing all files in the workspace root:"
-        ls -al $WORKSPACE
-            '''
+        stage('Checkout Code') {
+            steps {
+                sh '''
+                checkout scm
+                '''
+            }
         }
-    }
 
         stage('Install Docker Compose Plugin') {
             steps {
@@ -58,7 +52,7 @@ pipeline {
         stage('Start Test Docker Containers') {
             steps {
                 sh '''
-                docker compose -f $WORKSPACE/appointment-notifications/src/test/resources/docker-compose.yml up -d
+                docker compose -f $WORKSPACE/src/test/resources/docker-compose.yml up -d
                 '''
             }
         }
@@ -83,7 +77,7 @@ pipeline {
     post {
         always {
             sh '''
-            docker compose -f $WORKSPACE/appointment-notifications/src/test/resources/docker-compose.yml down
+            docker compose -f $WORKSPACE/src/test/resources/docker-compose.yml down
             '''
         }
         success {
