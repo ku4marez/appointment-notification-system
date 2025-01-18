@@ -11,12 +11,11 @@ pipeline {
         steps {
             checkout scm
             sh '''
-            echo "Workspace after checkout:"
-            ls -al $WORKSPACE
-            echo "Checking src/test/resources directory:"
-            ls -al $WORKSPACE/appointment-notifications/src/test/resources || echo "Directory not found"
-            echo "Checking directory:"
-            ls -al $WORKSPACE/appointment-notifications || echo "Directory not found"
+        echo "Listing all files in src/test/resources directory:"
+        ls -al $WORKSPACE/appointment-notifications/src/test/resources
+
+        echo "Listing all files in the workspace root:"
+        ls -al $WORKSPACE
             '''
         }
     }
@@ -57,9 +56,13 @@ pipeline {
 
         stage('Start Test Docker Containers') {
             steps {
-                sh '''
-                docker compose -f $WORKSPACE/appointment-notifications/src/test/resources/docker-compose.yml up -d
-                '''
+        dir('appointment-notifications/src/test/resources') {
+            sh '''
+            echo "Current directory contents:"
+            pwd
+            ls -al
+            '''
+        }
             }
         }
 
