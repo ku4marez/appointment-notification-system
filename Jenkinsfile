@@ -22,7 +22,6 @@ pipeline {
                 # Check if JDK 21 is already installed
                 if ! java -version 2>&1 | grep "21" > /dev/null; then
                     echo "Installing JDK 21..."
-                    apt-get update
                     apt-get install -y wget tar
                     wget -q https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21%2B35/OpenJDK21U-jdk_x64_linux_hotspot_21_35.tar.gz -O /tmp/jdk21.tar.gz
                     mkdir -p /usr/lib/jvm
