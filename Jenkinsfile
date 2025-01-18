@@ -13,7 +13,8 @@ pipeline {
             sh '''
         echo "Listing all files in src/test/resources directory:"
         ls -al $WORKSPACE/appointment-notifications/src/test/resources
-
+        echo "Listing all files in src/test/resources directory:"
+        ls -al $WORKSPACE/src/test/resources
         echo "Listing all files in the workspace root:"
         ls -al $WORKSPACE
             '''
