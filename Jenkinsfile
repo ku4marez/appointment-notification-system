@@ -7,6 +7,20 @@ pipeline {
     }
 
     stages {
+    stage('Checkout Code') {
+        steps {
+            checkout scm
+            sh '''
+            echo "Workspace after checkout:"
+            ls -al $WORKSPACE
+            echo "Checking src/test/resources directory:"
+            ls -al $WORKSPACE/appointment-notifications/src/test/resources || echo "Directory not found"
+            echo "Checking directory:"
+            ls -al $WORKSPACE/appointment-notifications || echo "Directory not found"
+            '''
+        }
+    }
+
         stage('Install Docker Compose Plugin') {
             steps {
                 sh '''
@@ -38,12 +52,6 @@ pipeline {
                 # Verify JDK installation
                 java -version
                 '''
-            }
-        }
-
-        stage('Checkout Code') {
-            steps {
-                checkout scm
             }
         }
 
