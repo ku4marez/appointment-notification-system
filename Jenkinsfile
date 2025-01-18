@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'eclipse-temurin:21-jdk' // Use JDK 21 image
+            args '-v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket
+        }
+    }
 
     environment {
         USER_NAME = credentials('USER_NAME')
@@ -7,6 +12,16 @@ pipeline {
     }
 
     stages {
+
+        stage('Verify Docker') {
+             steps {
+                 sh '''
+                docker --version
+                docker ps
+                '''
+            }
+        }
+
         stage('Checkout Code') {
             steps {
                 // Fetch the latest code from GitHub
@@ -14,31 +29,7 @@ pipeline {
             }
         }
 
-        stage('Install Docker CLI') {
-            steps {
-                sh '''
-                # Check if Docker is already installed
-                if ! [ -x "$(command -v docker)" ]; then
-                    echo "Installing Docker CLI..."
-                    apt-get update
-                    apt-get install -y docker.io
-                else
-                    echo "Docker CLI is already installed."
-                fi
-
-                # Verify Docker installation
-                docker --version
-                '''
-            }
-        }
-
         stage('Start Test Docker Containers') {
-            agent {
-                docker {
-                    image 'eclipse-temurin:21-jdk'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                }
-            }
             steps {
                 sh '''
                 # Start a MongoDB container for testing
@@ -48,12 +39,6 @@ pipeline {
         }
 
         stage('Build Application') {
-            agent {
-                docker {
-                    image 'eclipse-temurin:21-jdk'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                }
-            }
             steps {
                 sh '''
                 # Build the application using Maven with a custom profile
@@ -63,12 +48,6 @@ pipeline {
         }
 
         stage('Run Tests') {
-            agent {
-                docker {
-                    image 'eclipse-temurin:21-jdk'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                }
-            }
             steps {
                 sh '''
                 # Run application tests using Maven
@@ -80,8 +59,9 @@ pipeline {
 
     post {
         always {
-            sh '''
             echo "Cleaning up resources..."
+            // Stop and remove the MongoDB container
+            sh '''
             docker compose -f appointment-notifications/src/test/resources/docker-compose.yml down
             '''
         }
