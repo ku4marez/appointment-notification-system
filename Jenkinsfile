@@ -12,6 +12,37 @@ pipeline {
     }
 
     stages {
+            stage('Install Docker') {
+                steps {
+                    sh '''
+                    # Update package lists and install prerequisites
+                    apt-get update
+                    apt-get install -y \
+                        ca-certificates \
+                        curl \
+                        gnupg \
+                        lsb-release
+
+                    # Add Docker's GPG key and set up the repository
+                    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+                    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list
+
+                    # Install Docker
+                    apt-get update
+                    apt-get install -y docker-ce docker-ce-cli containerd.io
+
+                    # Add Jenkins user to the Docker group
+                    usermod -aG docker jenkins
+                    '''
+                }
+            }
+
+            stage('Test Docker') {
+                steps {
+                    sh 'docker --version'
+                }
+            }
+
         stage('Check Branch') {
             when {
                 expression {
