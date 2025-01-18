@@ -28,11 +28,12 @@ pipeline {
             steps {
                 sh '''
                 apt-get update
-                apt-get install -y wget apt-transport-https
-                wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | apt-key add -
-                echo "deb [signed-by=/usr/share/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb stable main" | tee /etc/apt/sources.list.d/adoptium.list
-                apt-get update
-                apt-get install -y temurin-21-jdk
+                apt-get install -y wget
+                wget https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21%2B35/OpenJDK21U-jdk_x64_linux_hotspot_21_35.tar.gz -O /tmp/jdk21.tar.gz
+                mkdir -p /usr/lib/jvm
+                tar -xzf /tmp/jdk21.tar.gz -C /usr/lib/jvm
+                update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-21/bin/java 1
+                update-alternatives --set java /usr/lib/jvm/jdk-21/bin/java
                 java -version
                 '''
             }
