@@ -56,13 +56,9 @@ pipeline {
 
         stage('Start Test Docker Containers') {
             steps {
-        dir('appointment-notifications/src/test/resources') {
-            sh '''
-            echo "Current directory contents:"
-            pwd
-            ls -al
-            '''
-        }
+                sh '''
+                docker compose -f $WORKSPACE/appointment-notifications/src/test/resources/docker-compose.yml up -d
+                '''
             }
         }
 
