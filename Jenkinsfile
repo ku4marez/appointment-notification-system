@@ -27,24 +27,15 @@ pipeline {
         stage('Set up JDK 21') {
             steps {
                 sh '''
-                # Update package lists
-                apt-get update
-
-                # Install wget if not already installed
-                apt-get install -y wget
-
-                # Download the JDK binary
+                # Download JDK 21 directly from Adoptium
                 wget -q https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21%2B35/OpenJDK21U-jdk_x64_linux_hotspot_21_35.tar.gz -O /tmp/jdk21.tar.gz
 
-                # Extract the binary to the JVM directory
-                mkdir -p /usr/lib/jvm
-                tar -xzf /tmp/jdk21.tar.gz -C /usr/lib/jvm --strip-components=1
+                # Extract and set up the JDK
+                mkdir -p /usr/lib/jvm/jdk21
+                tar -xzf /tmp/jdk21.tar.gz -C /usr/lib/jvm/jdk21 --strip-components=1
 
-                # Update alternatives to use the new JDK
-                update-alternatives --install /usr/bin/java java /usr/lib/jvm/bin/java 1
-                update-alternatives --set java /usr/lib/jvm/bin/java
-
-                # Verify the installation
+                # Set JDK 21 as default
+                export PATH=/usr/lib/jvm/jdk21/bin:$PATH
                 java -version
                 '''
             }
