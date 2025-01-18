@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'eclipse-temurin:21-jdk'
+            args '-u root:root'
+        }
+    }
 
     environment {
         USER_NAME = credentials('USER_NAME')
@@ -21,23 +26,6 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
-            }
-        }
-
-        stage('Set up JDK 21') {
-            steps {
-                sh '''
-                # Download JDK 21 directly from Adoptium
-                wget -q https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21%2B35/OpenJDK21U-jdk_x64_linux_hotspot_21_35.tar.gz -O /tmp/jdk21.tar.gz
-
-                # Extract and set up the JDK
-                mkdir -p /usr/lib/jvm/jdk21
-                tar -xzf /tmp/jdk21.tar.gz -C /usr/lib/jvm/jdk21 --strip-components=1
-
-                # Set JDK 21 as default
-                export PATH=/usr/lib/jvm/jdk21/bin:$PATH
-                java -version
-                '''
             }
         }
 
