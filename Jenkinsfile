@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'eclipse-temurin:21-jdk' // Use JDK 21 image
-            args '-v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket
-        }
-    }
+    agent any
 
     environment {
         USER_NAME = credentials('USER_NAME')
@@ -12,48 +7,76 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Build Custom Docker Image') {
             steps {
-                // Fetch the latest code from GitHub
-                checkout scm
+                script {
+                    // Build the custom Docker image
+                    sh '''
+                    docker build -t jenkins-custom:latest - <<EOF
+                    FROM eclipse-temurin:21-jdk
+
+                    # Install Docker CLI
+                    USER root
+                    RUN apt-get update && apt-get install -y docker.io curl && apt-get clean
+
+                    # Switch back to non-root user if needed
+                    USER jenkins
+                    EOF
+                    '''
+                }
             }
         }
 
         stage('Start Test Docker Containers') {
             steps {
-                sh '''
-                # Start a MongoDB container for testing
-                docker compose -f appointment-notifications/src/test/resources/docker-compose.yml up -d
-                '''
+                script {
+                    // Use the custom image and start containers
+                    sh '''
+                    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock jenkins-custom:latest sh -c "
+                    docker compose -f appointment-notifications/src/test/resources/docker-compose.yml up -d
+                    "
+                    '''
+                }
             }
         }
 
         stage('Build Application') {
             steps {
-                sh '''
-                # Build the application using Maven with a custom profile
-                mvn -s $WORKSPACE/.github/workflows/settings.xml clean package -P common-libraries -DskipTests
-                '''
+                script {
+                    // Build the application
+                    sh '''
+                    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock jenkins-custom:latest sh -c "
+                    mvn -s $WORKSPACE/.github/workflows/settings.xml clean package -P common-libraries -DskipTests
+                    "
+                    '''
+                }
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh '''
-                # Run application tests using Maven
-                mvn -s $WORKSPACE/.github/workflows/settings.xml test
-                '''
+                script {
+                    // Run tests
+                    sh '''
+                    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock jenkins-custom:latest sh -c "
+                    mvn -s $WORKSPACE/.github/workflows/settings.xml test
+                    "
+                    '''
+                }
             }
         }
     }
 
     post {
         always {
-            echo "Cleaning up resources..."
-            // Stop and remove the MongoDB container
-            sh '''
-            docker compose -f appointment-notifications/src/test/resources/docker-compose.yml down
-            '''
+            script {
+                // Tear down Docker Compose
+                sh '''
+                docker run --rm -v /var/run/docker.sock:/var/run/docker.sock jenkins-custom:latest sh -c "
+                docker compose -f appointment-notifications/src/test/resources/docker-compose.yml down
+                "
+                '''
+            }
         }
         success {
             echo "Pipeline completed successfully!"
