@@ -10,7 +10,7 @@ pipeline {
         stage('Check Branch') {
             when {
                 expression {
-                    return env.GIT_BRANCH ==~ /(origin\/master|origin\/dev)/ // Trigger only on master and dev branches
+                    return env.GIT_BRANCH ==~ /(origin\/master|origin\/dev)/
                 }
             }
             steps {
@@ -20,15 +20,15 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                checkout scm // Pull the latest code from the repository
+                checkout scm
             }
         }
 
         stage('Set up JDK 21') {
             steps {
                 sh '''
-                sudo apt update
-                sudo apt install -y openjdk-21-jdk
+                apt update
+                apt install -y openjdk-21-jdk
                 java -version
                 '''
             }
@@ -54,7 +54,7 @@ pipeline {
         stage('Adjust System Settings') {
             steps {
                 sh '''
-                sudo sysctl -w vm.max_map_count=1677720
+                sysctl -w vm.max_map_count=1677720
                 echo "Skipped adjusting swappiness as it is not supported on this runner."
                 '''
             }
@@ -63,7 +63,7 @@ pipeline {
         stage('Start MongoDB with Docker Compose') {
             steps {
                 dir('appointment-notifications/src/test/resources') {
-                    sh 'docker compose up -d' // Bring up MongoDB for testing
+                    sh 'docker compose up -d'
                 }
             }
         }
@@ -73,7 +73,7 @@ pipeline {
                 dir('appointment-notifications') {
                     sh '''
                     mvn -s $WORKSPACE/.github/workflows/settings.xml clean package -DskipTests
-                    ''' // Build the application without running tests
+                    '''
                 }
             }
         }
@@ -83,7 +83,7 @@ pipeline {
                 dir('appointment-notifications') {
                     sh '''
                     mvn -s $WORKSPACE/.github/workflows/settings.xml test
-                    ''' // Run the tests
+                    '''
                 }
             }
         }
@@ -93,7 +93,7 @@ pipeline {
         always {
             echo "Cleaning up resources..."
             dir('appointment-notifications/src/test/resources') {
-                sh 'docker compose down' // Stop and remove MongoDB containers
+                sh 'docker compose down'
             }
         }
         success {
