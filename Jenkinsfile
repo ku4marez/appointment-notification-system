@@ -7,15 +7,6 @@ pipeline {
     }
 
     stages {
-        stage('Verify Docker') {
-            steps {
-                sh '''
-                docker --version
-                docker ps
-                '''
-            }
-        }
-
         stage('Install JDK 21') {
             steps {
                 sh '''
@@ -47,7 +38,7 @@ pipeline {
         stage('Start Test Docker Containers') {
             steps {
                 sh '''
-                docker compose -f appointment-notifications/src/test/resources/docker-compose.yml up -d
+                docker-compose -f appointment-notifications/src/test/resources/docker-compose.yml up -d
                 '''
             }
         }
@@ -72,7 +63,7 @@ pipeline {
     post {
         always {
             sh '''
-            docker compose -f appointment-notifications/src/test/resources/docker-compose.yml down
+            docker-compose -f appointment-notifications/src/test/resources/docker-compose.yml down
             '''
         }
         success {
