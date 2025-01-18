@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: test-mongodb
+    ports:
+      - "27019:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    networks:
+      - test-network
+networks:
+  test-network:
+    driver: bridge
