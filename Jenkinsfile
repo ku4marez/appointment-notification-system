@@ -7,6 +7,18 @@ pipeline {
     }
 
     stages {
+        stage('Install Docker Compose Plugin') {
+            steps {
+                sh '''
+                # Install Docker Compose as a CLI plugin
+                mkdir -p ~/.docker/cli-plugins/
+                curl -fsSL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o ~/.docker/cli-plugins/docker-compose
+                chmod +x ~/.docker/cli-plugins/docker-compose
+                docker compose version
+                '''
+            }
+        }
+
         stage('Install JDK 21') {
             steps {
                 sh '''
@@ -38,7 +50,7 @@ pipeline {
         stage('Start Test Docker Containers') {
             steps {
                 sh '''
-                docker-compose -f appointment-notifications/src/test/resources/docker-compose.yml up -d
+                docker compose -f appointment-notifications/src/test/resources/docker-compose.yml up -d
                 '''
             }
         }
@@ -63,7 +75,7 @@ pipeline {
     post {
         always {
             sh '''
-            docker-compose -f appointment-notifications/src/test/resources/docker-compose.yml down
+            docker compose -f appointment-notifications/src/test/resources/docker-compose.yml down
             '''
         }
         success {
