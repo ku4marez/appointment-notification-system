@@ -27,8 +27,12 @@ pipeline {
         stage('Set up JDK 21') {
             steps {
                 sh '''
-                apt update
-                apt install -y openjdk-21-jdk
+                apt-get update
+                apt-get install -y wget apt-transport-https
+                wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | apt-key add -
+                echo "deb [signed-by=/usr/share/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb stable main" | tee /etc/apt/sources.list.d/adoptium.list
+                apt-get update
+                apt-get install -y temurin-21-jdk
                 java -version
                 '''
             }
