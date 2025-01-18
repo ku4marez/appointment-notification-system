@@ -50,7 +50,7 @@ pipeline {
         stage('Start Test Docker Containers') {
             steps {
                 sh '''
-                docker compose -f appointment-notifications/src/test/resources/docker-compose.yml up -d
+                docker compose -f $WORKSPACE/appointment-notifications/src/test/resources/docker-compose.yml up -d
                 '''
             }
         }
@@ -75,7 +75,7 @@ pipeline {
     post {
         always {
             sh '''
-            docker compose -f appointment-notifications/src/test/resources/docker-compose.yml down
+            docker compose -f $WORKSPACE/appointment-notifications/src/test/resources/docker-compose.yml down
             '''
         }
         success {
