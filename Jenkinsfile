@@ -1,5 +1,5 @@
 pipeline {
-    agent any // Use the default Jenkins node
+    agent any
 
     environment {
         USER_NAME = credentials('USER_NAME')
