@@ -55,25 +55,10 @@ pipeline {
             }
         }
 
-        stage('Clone and Build Common Libraries') {
-             steps {
-                sh '''
-                # Clone the common-libraries repository
-                git clone https://github.com/ku4marez/common-libraries.git
-
-                # Navigate to the project directory
-                cd common-libraries
-
-                # Build and install into local Maven repository
-                mvn clean install
-                '''
-             }
-        }
-
         stage('Build Application') {
             steps {
                 sh '''
-                mvn -s $WORKSPACE/.github/workflows/settings.xml clean package -P common-libraries -DskipTests
+                mvn -s $WORKSPACE/.github/workflows/settings.xml clean package -DskipTests
                 '''
             }
         }

@@ -108,6 +108,13 @@
 		</dependencies>
 	</dependencyManagement>
 
+	<repositories>
+		<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/ku4marez/common-libraries</url>
+		</repository>
+	</repositories>
+
 	<build>
 		<plugins>
 			<plugin>
