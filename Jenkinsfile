@@ -13,6 +13,15 @@ pipeline {
             }
         }
 
+        stage('Verify Environment Variables') {
+            steps {
+                sh '''
+                echo "USER_NAME: $USER_NAME"
+                echo "ACCESS_TOKEN: $ACCESS_TOKEN"
+                '''
+            }
+        }
+
         stage('Install Docker Compose Plugin') {
             steps {
                 sh '''
