@@ -58,8 +58,9 @@ pipeline {
         stage('Build Application') {
             steps {
                 sh '''
-                mvn -Dgithub.username=$USER_NAME -Dgithub.token=$ACCESS_TOKEN \
-                    -s $WORKSPACE/.github/workflows/settings.xml clean package -P common-libraries -DskipTests
+                mvn clean package -P common-libraries -DskipTests \
+                    -Dgithub.username=$USER_NAME \
+                    -Dgithub.token=$ACCESS_TOKEN
                 '''
             }
         }
