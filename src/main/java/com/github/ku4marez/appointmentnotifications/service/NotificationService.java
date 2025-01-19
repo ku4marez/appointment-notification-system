@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class NotificationService {
 
+    @SuppressWarnings("unused")
     private final KafkaProducerUtil kafkaProducerUtil;
     private final ClinicManagementClient clinicManagementClient;
     private final CommandGateway commandGateway;
