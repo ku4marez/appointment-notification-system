@@ -13,15 +13,6 @@ pipeline {
             }
         }
 
-        stage('Verify Environment Variables') {
-            steps {
-                sh '''
-                echo "USER_NAME: $USER_NAME"
-                echo "ACCESS_TOKEN: $ACCESS_TOKEN"
-                '''
-            }
-        }
-
         stage('Install Docker Compose Plugin') {
             steps {
                 sh '''
@@ -67,7 +58,8 @@ pipeline {
         stage('Build Application') {
             steps {
                 sh '''
-                mvn -s $WORKSPACE/.github/workflows/settings.xml clean package -DskipTests
+                mvn -Dgithub.username=$USER_NAME -Dgithub.token=$ACCESS_TOKEN \
+                    -s $WORKSPACE/.github/workflows/settings.xml clean package -P common-libraries -DskipTests
                 '''
             }
         }
