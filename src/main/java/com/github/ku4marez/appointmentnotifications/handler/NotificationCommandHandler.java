@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class NotificationCommandHandler {
-
     private final NotificationRepository notificationRepository;
 
     @Autowired
@@ -20,7 +19,7 @@ public class NotificationCommandHandler {
     }
 
     @CommandHandler
-    public void handle(CreateNotificationCommand command) {
+    public NotificationEntity handle(CreateNotificationCommand command) {
         NotificationEntity notification = new NotificationEntity();
         notification.setDoctorId(command.doctorId());
         notification.setPatientId(command.patientId());
@@ -29,5 +28,6 @@ public class NotificationCommandHandler {
         notificationRepository.save(notification);
 
         log.info("Notification created: {}", notification);
+        return notification;
     }
 }

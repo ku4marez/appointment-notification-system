@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>New Appointment Notification</title>
+</head>
+<body>
+<h1>New Appointment Scheduled</h1>
+<p>Dear Dr. <span th:text="${doctorName}"></span>,</p>
+<p>You have a new appointment with patient <span th:text="${patientName}"></span> on <span th:text="${appointmentDateTime}"></span>.</p>
+<p>Best regards,</p>
+<p>The Clinic Management Team</p>
+</body>
+</html>
