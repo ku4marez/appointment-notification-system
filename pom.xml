@@ -19,7 +19,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<spring-cloud.version>2022.0.4</spring-cloud.version>
-		<commonlibraries.version>1.1.8</commonlibraries.version>
+		<commonlibraries.version>1.2.3</commonlibraries.version>
 		<axon.version>4.8.0</axon.version>
 		<twilio.version>8.32.0</twilio.version>
 		<modelmapper.version>3.1.1</modelmapper.version>
