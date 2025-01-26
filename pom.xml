@@ -155,7 +155,7 @@
 	<repositories>
 		<repository>
 			<id>github</id>
-			<url>https://${github.username}:${github.token}@maven.pkg.github.com/ku4marez/common-libraries</url>
+			<url>https://maven.pkg.github.com/ku4marez/common-libraries</url>
 		</repository>
 	</repositories>
 

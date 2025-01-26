@@ -58,7 +58,10 @@ pipeline {
         stage('Build Application') {
             steps {
                 sh '''
-                mvn -X clean package -DskipTests -Dgithub.username=$USER_NAME -Dgithub.token=$ACCESS_TOKEN
+                mvn clean package -DskipTests \
+                    -Dgithub.username=$USER_NAME \
+                    -Dgithub.token=$ACCESS_TOKEN \
+                    -Dmaven.repo.remote="https://$USER_NAME:$ACCESS_TOKEN@maven.pkg.github.com/ku4marez/common-libraries"
                 '''
             }
         }
