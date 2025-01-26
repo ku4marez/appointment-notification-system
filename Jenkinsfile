@@ -30,6 +30,27 @@ stage('Prepare Maven Settings') {
             <password>${ACCESS_TOKEN}</password>
         </server>
     </servers>
+    <mirrors>
+        <mirror>
+            <id>github-mirror</id>
+            <url>https://maven.pkg.github.com/ku4marez/common-libraries</url>
+            <mirrorOf>*</mirrorOf>
+        </mirror>
+    </mirrors>
+    <profiles>
+        <profile>
+            <id>github</id>
+            <repositories>
+                <repository>
+                    <id>github</id>
+                    <url>https://maven.pkg.github.com/ku4marez/common-libraries</url>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+    <activeProfiles>
+        <activeProfile>github</activeProfile>
+    </activeProfiles>
 </settings>
 EOF
             '''
@@ -76,6 +97,7 @@ EOF
         stage('Build Application') {
             steps {
                 sh '''
+                sh 'cat ~/.m2/settings.xml'
                 mvn clean package -DskipTests
                 '''
             }
