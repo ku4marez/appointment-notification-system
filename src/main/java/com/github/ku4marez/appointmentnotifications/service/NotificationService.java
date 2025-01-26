@@ -3,7 +3,6 @@ package com.github.ku4marez.appointmentnotifications.service;
 import com.github.ku4marez.appointmentnotifications.dto.CreateNotificationCommand;
 import com.github.ku4marez.appointmentnotifications.dto.NotificationSentEvent;
 import com.github.ku4marez.appointmentnotifications.endpoint.ClinicManagementClient;
-import com.github.ku4marez.appointmentnotifications.endpoint.TwilioClient;
 import com.github.ku4marez.appointmentnotifications.entity.NotificationEntity;
 import com.github.ku4marez.commonlibraries.dto.AppointmentDTO;
 import com.github.ku4marez.commonlibraries.dto.DoctorDTO;
@@ -22,18 +21,18 @@ public class NotificationService {
     private final ClinicManagementClient clinicManagementClient;
     private final CommandGateway commandGateway;
     private final EmailService emailService;
-    private final TwilioClient twilioClient;
+    private final SMSService smsService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
     public NotificationService(ClinicManagementClient clinicManagementClient,
                                CommandGateway commandGateway,
                                EmailService emailService,
-                               TwilioClient twilioClient, ApplicationEventPublisher eventPublisher) {
+                               SMSService smsService, ApplicationEventPublisher eventPublisher) {
         this.clinicManagementClient = clinicManagementClient;
         this.commandGateway = commandGateway;
         this.emailService = emailService;
-        this.twilioClient = twilioClient;
+        this.smsService = smsService;
         this.eventPublisher = eventPublisher;
     }
 
@@ -65,7 +64,7 @@ public class NotificationService {
 
         // Send SMS to doctor
         if (doctor.phoneNumber() != null) {
-            twilioClient.sendSMS(doctor.phoneNumber(), doctorMessage);
+            smsService.sendAppointmentSMSToDoctor(doctor, patient, appointmentDTO);
             log.info("SMS sent to doctor: {}", doctor.phoneNumber());
         }
 
@@ -92,7 +91,7 @@ public class NotificationService {
 
         // Send SMS to patient
         if (patient.phoneNumber() != null) {
-            twilioClient.sendSMS(patient.phoneNumber(), patientMessage);
+            smsService.sendAppointmentSMSToPatient(doctor, patient, appointmentDTO);
             log.info("SMS sent to patient: {}", patient.phoneNumber());
         }
 

@@ -1,6 +1,8 @@
 package com.github.ku4marez.appointmentnotifications.controller;
 
+import com.github.ku4marez.appointmentnotifications.dto.NotificationDTO;
 import com.github.ku4marez.appointmentnotifications.entity.NotificationEntity;
+import com.github.ku4marez.appointmentnotifications.mapper.NotificationMapper;
 import com.github.ku4marez.appointmentnotifications.query.FindNotificationsByDoctorQuery;
 import com.github.ku4marez.appointmentnotifications.query.FindNotificationsByPatientQuery;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
@@ -19,23 +21,36 @@ import java.util.List;
 public class NotificationController {
 
     private final QueryGateway queryGateway;
+    private final NotificationMapper notificationMapper;
 
     @Autowired
-    public NotificationController(QueryGateway queryGateway) {
+    public NotificationController(QueryGateway queryGateway, NotificationMapper notificationMapper) {
         this.queryGateway = queryGateway;
+        this.notificationMapper = notificationMapper;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/doctor/{doctorId}")
-    public List<NotificationEntity> getNotificationsForDoctor(@PathVariable String doctorId) {
+    public List<NotificationDTO> getNotificationsForDoctor(@PathVariable String doctorId) {
         FindNotificationsByDoctorQuery query = new FindNotificationsByDoctorQuery(doctorId);
-        return queryGateway.query(query, ResponseTypes.multipleInstancesOf(NotificationEntity.class)).join();
+        List<NotificationEntity> notificationEntities = queryGateway
+                .query(query, ResponseTypes.multipleInstancesOf(NotificationEntity.class))
+                .join();
+        return notificationEntities.stream()
+                .map(notificationMapper::toDto)
+                .toList();
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/patient/{patientId}")
-    public List<NotificationEntity> getNotificationsForPatient(@PathVariable String patientId) {
+    public List<NotificationDTO> getNotificationsForPatient(@PathVariable String patientId) {
         FindNotificationsByPatientQuery query = new FindNotificationsByPatientQuery(patientId);
-        return queryGateway.query(query, ResponseTypes.multipleInstancesOf(NotificationEntity.class)).join();
+        List<NotificationEntity> notificationEntities = queryGateway
+                .query(query, ResponseTypes.multipleInstancesOf(NotificationEntity.class))
+                .join();
+        return notificationEntities.stream()
+                .map(notificationMapper::toDto)
+                .toList();
     }
 }
+
