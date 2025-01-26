@@ -13,14 +13,29 @@ pipeline {
             }
         }
 
-        stage('Setup Maven Configuration') {
-            steps {
-                sh '''
-                mkdir -p ~/.m2
-                cp $WORKSPACE/.m2/settings.xml ~/.m2/settings.xml
-                '''
-            }
-        }
+                stage('Prepare Maven Settings') {
+                    steps {
+                        script {
+                            // Create the settings.xml file with resolved credentials
+                            sh '''
+                            mkdir -p ~/.m2
+                            cat > ~/.m2/settings.xml <<EOF
+        <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+            <servers>
+                <server>
+                    <id>github</id>
+                    <username>${USER_NAME}</username>
+                    <password>${ACCESS_TOKEN}</password>
+                </server>
+            </servers>
+        </settings>
+        EOF
+                            '''
+                        }
+                    }
+                }
 
         stage('Install Docker Compose Plugin') {
             steps {
@@ -60,7 +75,7 @@ pipeline {
         stage('Build Application') {
             steps {
                 sh '''
-                mvn clean package -DskipTests --settings $WORKSPACE/.m2/settings.xml
+                mvn clean package -DskipTests
                 '''
             }
         }
@@ -68,7 +83,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                mvn test --settings $WORKSPACE/.m2/settings.xml
+                mvn test
                 '''
             }
         }
