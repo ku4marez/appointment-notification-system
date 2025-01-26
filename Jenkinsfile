@@ -69,7 +69,9 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                mvn -s $WORKSPACE/.github/workflows/settings.xml test
+                mvn test -Dgithub.username=$USER_NAME \
+                    -Dgithub.token=$ACCESS_TOKEN \
+                    -Dmaven.repo.remote="https://$USER_NAME:$ACCESS_TOKEN@maven.pkg.github.com/ku4marez/common-libraries
                 '''
             }
         }
