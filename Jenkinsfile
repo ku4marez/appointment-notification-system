@@ -13,29 +13,30 @@ pipeline {
             }
         }
 
-                stage('Prepare Maven Settings') {
-                    steps {
-                        script {
-                            // Create the settings.xml file with resolved credentials
-                            sh '''
-                            mkdir -p ~/.m2
-                            cat > ~/.m2/settings.xml <<EOF
-        <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
-            <servers>
-                <server>
-                    <id>github</id>
-                    <username>${USER_NAME}</username>
-                    <password>${ACCESS_TOKEN}</password>
-                </server>
-            </servers>
-        </settings>
-        EOF
-                            '''
-                        }
-                    }
-                }
+stage('Prepare Maven Settings') {
+    steps {
+        script {
+            // Create the settings.xml file with resolved credentials
+            sh '''
+            mkdir -p ~/.m2
+            cat <<EOF > ~/.m2/settings.xml
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <servers>
+        <server>
+            <id>github</id>
+            <username>${USER_NAME}</username>
+            <password>${ACCESS_TOKEN}</password>
+        </server>
+    </servers>
+</settings>
+EOF
+            '''
+        }
+    }
+}
+
 
         stage('Install Docker Compose Plugin') {
             steps {
