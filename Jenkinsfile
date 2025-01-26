@@ -13,10 +13,18 @@ pipeline {
             }
         }
 
+        stage('Setup Maven Configuration') {
+            steps {
+                sh '''
+                mkdir -p ~/.m2
+                cp $WORKSPACE/.m2/settings.xml ~/.m2/settings.xml
+                '''
+            }
+        }
+
         stage('Install Docker Compose Plugin') {
             steps {
                 sh '''
-                # Install Docker Compose as a CLI plugin
                 mkdir -p ~/.docker/cli-plugins/
                 curl -fsSL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o ~/.docker/cli-plugins/docker-compose
                 chmod +x ~/.docker/cli-plugins/docker-compose
@@ -28,20 +36,14 @@ pipeline {
         stage('Install JDK 21') {
             steps {
                 sh '''
-                # Check if JDK 21 is already installed
                 if ! java -version 2>&1 | grep "21" > /dev/null; then
-                    echo "Installing JDK 21..."
                     apt-get install -y wget tar
                     wget -q https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21%2B35/OpenJDK21U-jdk_x64_linux_hotspot_21_35.tar.gz -O /tmp/jdk21.tar.gz
                     mkdir -p /usr/lib/jvm
                     tar -xzf /tmp/jdk21.tar.gz -C /usr/lib/jvm --strip-components=1
                     update-alternatives --install /usr/bin/java java /usr/lib/jvm/bin/java 1
                     update-alternatives --set java /usr/lib/jvm/bin/java
-                else
-                    echo "JDK 21 is already installed."
                 fi
-
-                # Verify JDK installation
                 java -version
                 '''
             }
@@ -58,10 +60,7 @@ pipeline {
         stage('Build Application') {
             steps {
                 sh '''
-                mvn clean package -DskipTests \
-                    -Dgithub.username=$USER_NAME \
-                    -Dgithub.token=$ACCESS_TOKEN \
-                    -Dmaven.repo.remote="https://$USER_NAME:$ACCESS_TOKEN@maven.pkg.github.com/ku4marez/common-libraries"
+                mvn clean package -DskipTests --settings $WORKSPACE/.m2/settings.xml
                 '''
             }
         }
@@ -69,9 +68,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                mvn test -Dgithub.username=$USER_NAME \
-                    -Dgithub.token=$ACCESS_TOKEN \
-                    -Dmaven.repo.remote="https://$USER_NAME:$ACCESS_TOKEN@maven.pkg.github.com/ku4marez/common-libraries
+                mvn test --settings $WORKSPACE/.m2/settings.xml
                 '''
             }
         }
