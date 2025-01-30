@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GITHUB_USERNAME = credentials('GITHUB_CREDENTIALS_USR')
-        GITHUB_TOKEN = credentials('GITHUB_CREDENTIALS_PSW')
+        GITHUB_CREDENTIALS = credentials('GITHUB_CREDENTIALS')
     }
 
     stages {
@@ -59,8 +58,8 @@ pipeline {
             steps {
                 sh '''
                 mvn clean package -DskipTests -s ~/.m2/settings.xml \
-                    -Dgithub.username=$GITHUB_USERNAME \
-                    -Dgithub.token=$GITHUB_TOKEN
+                    -Dgithub.username=$(echo $GITHUB_CREDENTIALS | cut -d: -f1) \
+                    -Dgithub.token=$(echo $GITHUB_CREDENTIALS | cut -d: -f2)
                 '''
             }
         }
@@ -69,8 +68,8 @@ pipeline {
             steps {
                 sh '''
                 mvn test -s ~/.m2/settings.xml \
-                    -Dgithub.username=$GITHUB_USERNAME \
-                    -Dgithub.token=$GITHUB_TOKEN
+                    -Dgithub.username=$(echo $GITHUB_CREDENTIALS | cut -d: -f1) \
+                    -Dgithub.token=$(echo $GITHUB_CREDENTIALS | cut -d: -f2)
                 '''
             }
         }
