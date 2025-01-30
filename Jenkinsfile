@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        USER_NAME = credentials('USER_NAME')
-        ACCESS_TOKEN = credentials('ACCESS_TOKEN')
+        GITHUB_USERNAME = credentials('GITHUB_CREDENTIALS_USR')
+        GITHUB_TOKEN = credentials('GITHUB_CREDENTIALS_PSW')
     }
 
     stages {
@@ -58,10 +58,9 @@ pipeline {
         stage('Build Application') {
             steps {
                 sh '''
-                mvn clean package -DskipTests \
-                    -Dgithub.username=$USER_NAME \
-                    -Dgithub.token=$ACCESS_TOKEN \
-                    -Dmaven.repo.remote="https://$USER_NAME:$ACCESS_TOKEN@maven.pkg.github.com/ku4marez/common-libraries"
+                mvn clean package -DskipTests -s ~/.m2/settings.xml \
+                    -Dgithub.username=$GITHUB_USERNAME \
+                    -Dgithub.token=$GITHUB_TOKEN
                 '''
             }
         }
@@ -69,9 +68,9 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                mvn test -Dgithub.username=$USER_NAME \
-                    -Dgithub.token=$ACCESS_TOKEN \
-                    -Dmaven.repo.remote="https://$USER_NAME:$ACCESS_TOKEN@maven.pkg.github.com/ku4marez/common-libraries
+                mvn test -s ~/.m2/settings.xml \
+                    -Dgithub.username=$GITHUB_USERNAME \
+                    -Dgithub.token=$GITHUB_TOKEN
                 '''
             }
         }
