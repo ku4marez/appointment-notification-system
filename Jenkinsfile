@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        GITHUB_CREDENTIALS = credentials('GITHUB_CREDENTIALS')
+        GITHUB_USERNAME = credentials('GITHUB_CREDENTIALS_USR')
+        GITHUB_TOKEN = credentials('GITHUB_CREDENTIALS_PSW')
     }
 
     stages {
@@ -54,12 +55,21 @@ pipeline {
             }
         }
 
+        stage('Debug Credentials') {
+            steps {
+                script {
+                    sh 'echo "GITHUB_USERNAME: $GITHUB_USERNAME"'
+                    sh 'echo "GITHUB_TOKEN: $(echo $GITHUB_TOKEN | sed "s/./*/g")"'  // Mask token for security
+                }
+            }
+        }
+
         stage('Build Application') {
             steps {
                 sh '''
                 mvn clean package -DskipTests -s $WORKSPACE/.m2/settings.xml \
-                    -Dgithub.username=$(echo $GITHUB_CREDENTIALS | cut -d: -f1) \
-                    -Dgithub.token=$(echo $GITHUB_CREDENTIALS | cut -d: -f2)
+                    -Dgithub.username=$GITHUB_USERNAME \
+                    -Dgithub.token=$GITHUB_TOKEN
                 '''
             }
         }
@@ -68,8 +78,8 @@ pipeline {
             steps {
                 sh '''
                 mvn test -s $WORKSPACE/.m2/settings.xml \
-                    -Dgithub.username=$(echo $GITHUB_CREDENTIALS | cut -d: -f1) \
-                    -Dgithub.token=$(echo $GITHUB_CREDENTIALS | cut -d: -f2)
+                    -Dgithub.username=$GITHUB_USERNAME \
+                    -Dgithub.token=$GITHUB_TOKEN
                 '''
             }
         }
