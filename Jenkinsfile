@@ -57,7 +57,7 @@ pipeline {
         stage('Build Application') {
             steps {
                 sh '''
-                mvn clean package -DskipTests -s ~/.m2/settings.xml \
+                mvn clean package -DskipTests -s $WORKSPACE/.m2/settings.xml \
                     -Dgithub.username=$(echo $GITHUB_CREDENTIALS | cut -d: -f1) \
                     -Dgithub.token=$(echo $GITHUB_CREDENTIALS | cut -d: -f2)
                 '''
@@ -67,7 +67,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                mvn test -s ~/.m2/settings.xml \
+                mvn test -s $WORKSPACE/.m2/settings.xml \
                     -Dgithub.username=$(echo $GITHUB_CREDENTIALS | cut -d: -f1) \
                     -Dgithub.token=$(echo $GITHUB_CREDENTIALS | cut -d: -f2)
                 '''
