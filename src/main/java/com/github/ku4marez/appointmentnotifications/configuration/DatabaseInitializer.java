@@ -7,11 +7,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DatabaseConfiguration {
+public class DatabaseInitializer {
 
     private final MongoTemplate mongoTemplate;
 
-    public DatabaseConfiguration(MongoTemplate mongoTemplate) {
+    public DatabaseInitializer(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
 
