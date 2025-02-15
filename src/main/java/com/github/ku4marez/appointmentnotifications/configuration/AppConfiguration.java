@@ -9,7 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @Configuration
-@EnableMongoAuditing
+@EnableMongoAuditing(auditorAwareRef = "auditorProvider")
 public class AppConfiguration {
 
     @Bean
