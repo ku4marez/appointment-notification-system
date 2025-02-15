@@ -12,8 +12,11 @@ public class KafkaConsumerConfiguration {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
+    @Value("${spring.kafka.consumer.group-id}")
+    private String groupId;
+
     @Bean
     public KafkaConsumerUtil kafkaConsumerUtil() {
-        return new KafkaConsumerUtil(bootstrapServers, "notification-service-group", KafkaConstants.APPOINTMENT_CREATED_TOPIC);
+        return new KafkaConsumerUtil(bootstrapServers, groupId, KafkaConstants.APPOINTMENT_CREATED_TOPIC);
     }
 }
